@@ -5,34 +5,41 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
+// Made to comply https://dvv.fi/henkilotunnus
+// DdMmYy[century][numberId][checkMark]
 
 public class Henkilotunnus {
 
-    private String henkilotunnus;
+    private String socialSecurityNumber;
+    private int age;
+    private String gender;
 
-    public Henkilotunnus(String givenHenkilotunnus) {
-        if (isCorrectHenkilotunnus(givenHenkilotunnus))
-            henkilotunnus = givenHenkilotunnus;
+    // When creating an object instance of class Henkilotunnus, social security number must be valid!
+    public Henkilotunnus(String givenSocialSecurityNumber) {
+        if (validateSocialSecurityNumber(givenSocialSecurityNumber))
+            socialSecurityNumber = givenSocialSecurityNumber;
         else
-            throw new IllegalArgumentException("Ei sallitussa henkilötunnus muodossa.");
+            throw new IllegalArgumentException("Social Security Number is not in allowed form.");
     }
 
-    public boolean isCorrectHenkilotunnus(String givenHenkilotunnus) {
+    // Returns a boolean value of a social security number, whether it is valid or not. Can be used as a static method.
+    public static boolean validateSocialSecurityNumber(String givenSocialSecurityNumber) {
         final Pattern PATTERN =
                 Pattern.compile("^(0[1-9]|[1-2][0-9]|30|31)(0[1-9]|1[0-2])([0-9][0-9])[-+A][0-9]{3}[0-9A-Z]$");
 
-        Matcher matcher = PATTERN.matcher(givenHenkilotunnus);
+        Matcher matcher = PATTERN.matcher(givenSocialSecurityNumber);
         return matcher.matches();
     }
 
-    public int getIka() {
-        StringBuilder dateMonthYear = new StringBuilder(henkilotunnus);
+    // Calculates age of social security numbers 7 first characters.
+    private void calculateAge() {
+        StringBuilder dateMonthYear = new StringBuilder(socialSecurityNumber);
         String birthDate = dateMonthYear.substring(0, 6);
-        char valimerkki = dateMonthYear.charAt(6);
+        char note = dateMonthYear.charAt(6);
 
         int year = Integer.parseInt(birthDate.substring(4));
         int century = 1800;
-        switch (valimerkki) {
+        switch (note) {
             case 'A':
                 century = 2000;
                 break;
@@ -48,18 +55,31 @@ public class Henkilotunnus {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
         LocalDate dateOfBirth = LocalDate.parse(birthDate, formatter);
         LocalDate now = LocalDate.now();
-        Period age = Period.between(dateOfBirth, now);
-        return age.getYears();
+        Period agePeriod = Period.between(dateOfBirth, now);
+        age = agePeriod.getYears();
     }
 
-    public String getSukupuoli() {
-        StringBuilder yksilointinumeroMuodostaja = new StringBuilder(henkilotunnus);
-        String yksilointinumeroMj = yksilointinumeroMuodostaja.substring(7,10);
-        int yksilointinumero = Integer.parseInt(yksilointinumeroMj);
+    // Calculates gender based on social security numbers 8 to 10 characters.
+    private void calculateGender() {
+        StringBuilder idNumberBuilder = new StringBuilder(socialSecurityNumber);
+        String idNumberStr = idNumberBuilder.substring(7, 10);
+        int idNumber = Integer.parseInt(idNumberStr);
 
-        if (yksilointinumero % 2 == 0)
-            return "nainen";
+        if (idNumber % 2 == 0)
+            gender = "female";
         else
-            return "mies";
+            gender = "male";
+    }
+
+    public int getAge() {
+        if (age == 0)
+            calculateAge();
+        return age;
+    }
+
+    public String getGender() {
+        if (gender == null)
+            calculateGender();
+        return gender;
     }
 }
