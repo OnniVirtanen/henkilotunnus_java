@@ -28,18 +28,33 @@ public class Henkilotunnus {
                 Pattern.compile("^(0[1-9]|[1-2][0-9]|30|31)(0[1-9]|1[0-2])([0-9][0-9])[-+A][0-9]{3}[0-9A-Z]$");
 
         Matcher matcher = PATTERN.matcher(givenSocialSecurityNumber);
-        return matcher.matches();
+
+        StringBuilder ssn = new StringBuilder(givenSocialSecurityNumber);
+        String birthDateAndNumberId = ssn.substring(0,6);
+        birthDateAndNumberId += ssn.substring(7,10);
+
+        if (birthDateAndNumberId.charAt(0) == '0')
+            birthDateAndNumberId = birthDateAndNumberId.substring(1, birthDateAndNumberId.length() - 1);
+
+        char[] ssnCheckMarkList = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'H', 'J',
+            'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'};
+
+        Character ssnCheckMark = ssnCheckMarkList[Integer.parseInt(birthDateAndNumberId) % 31];
+        Character userSsnCheckMark = givenSocialSecurityNumber.charAt(givenSocialSecurityNumber.length() - 1);
+        boolean validSsnCheckMark = ssnCheckMark.equals(userSsnCheckMark);
+
+        return matcher.matches() && validSsnCheckMark;
     }
 
     // Calculates age of social security numbers 7 first characters.
     private void calculateAge() {
         StringBuilder dateMonthYear = new StringBuilder(socialSecurityNumber);
         String birthDate = dateMonthYear.substring(0, 6);
-        char note = dateMonthYear.charAt(6);
+        char centuryMark = dateMonthYear.charAt(6);
 
         int year = Integer.parseInt(birthDate.substring(4));
         int century = 1800;
-        switch (note) {
+        switch (centuryMark) {
             case 'A':
                 century = 2000;
                 break;

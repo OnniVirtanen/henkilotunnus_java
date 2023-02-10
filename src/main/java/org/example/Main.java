@@ -5,10 +5,9 @@ import java.util.Scanner;
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
-        System.out.print("Syötä henkilötunnus: ");
-        Henkilotunnus hetu = new Henkilotunnus("110101A101ö");
+        Henkilotunnus hetu = new Henkilotunnus("ssn-number");
 
-        System.out.println(hetu.getAge());
-        System.out.println(hetu.getGender());
+        System.out.printf("age: %d%n", hetu.getAge());
+        System.out.printf("gender: %s%n", hetu.getGender());
     }
 }
