@@ -47,7 +47,7 @@ public class Henkilotunnus {
     }
 
     // Calculates age of social security numbers 7 first characters.
-    private void calculateAge() {
+    public int getAge() {
         StringBuilder dateMonthYear = new StringBuilder(socialSecurityNumber);
         String birthDate = dateMonthYear.substring(0, 6);
         char centuryMark = dateMonthYear.charAt(6);
@@ -72,10 +72,12 @@ public class Henkilotunnus {
         LocalDate now = LocalDate.now();
         Period agePeriod = Period.between(dateOfBirth, now);
         age = agePeriod.getYears();
+
+        return age;
     }
 
     // Calculates gender based on social security numbers 8 to 10 characters.
-    private void calculateGender() {
+    public String getGender() {
         StringBuilder idNumberBuilder = new StringBuilder(socialSecurityNumber);
         String idNumberStr = idNumberBuilder.substring(7, 10);
         int idNumber = Integer.parseInt(idNumberStr);
@@ -84,17 +86,8 @@ public class Henkilotunnus {
             gender = "female";
         else
             gender = "male";
-    }
 
-    public int getAge() {
-        if (age == 0)
-            calculateAge();
-        return age;
-    }
-
-    public String getGender() {
-        if (gender == null)
-            calculateGender();
         return gender;
     }
+
 }
